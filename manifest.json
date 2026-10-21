@@ -1,0 +1,15 @@
+
+{
+  "id": "./",
+  "name": "نبض الطالب",
+  "short_name": "نبض الطالب",
+  "description": "منصتك الذكية لتنظيم المذاكرة",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1535",
+  "theme_color": "#0b1535",
+  "icons": []
+}
