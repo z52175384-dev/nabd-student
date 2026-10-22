@@ -1,27 +1,195 @@
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<"><span>✅</span>مهامي اليومية</div>
-      <div class="tool"><span>🧠</span>المراجعة الذكية</div>
-    </section>
-  </main>
-  <footer>نبض الطالب · طريقك نحو التفوق</footer>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071426">
+<title>نبض الطالب</title>
+<link rel="manifest" href="./manifest.json">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#071426;color:#f3f7ff;font-family:Arial,Tahoma,sans-serif}
+header{padding:25px 18px;background:#102844;border-bottom:1px solid #234361}
+header h1{margin:0 0 8px;color:#45dcf5;font-size:26px}
+header p{margin:0;color:#b5c8dd;font-size:14px}
+main{max-width:720px;margin:auto;padding:18px 14px 100px}
+h2{font-size:20px}
+.card{background:#10223a;border:1px solid #24435f;border-radius:17px;padding:17px;margin:14px 0}
+form{display:flex;gap:8px;flex-wrap:wrap}
+input,select{background:#071426;color:white;border:1px solid #355571;border-radius:10px;padding:12px;min-width:0}
+input{flex:1}
+button{border:0;border-radius:10px;padding:12px 15px;background:#42d9f5;color:#071426;font-weight:bold;cursor:pointer}
+.task{display:flex;align-items:center;gap:10px;border-bottom:1px solid #263c53;padding:12px 0}
+.task:last-child{border:0}
+.task input{flex:none;width:18px}
+.task span{flex:1;overflow-wrap:anywhere}
+.task.done span{text-decoration:line-through;color:#8ba1b8}
+.delete{background:#492536;color:#ffc0cc;padding:8px 10px}
+.empty{padding:15px 0;color:#a8bbd0;font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.stat{background:#10223a;border-radius:13px;padding:14px 8px;text-align:center}
+.stat strong{display:block;color:#42d9f5;font-size:24px;margin-bottom:5px}
+.stat span{font-size:11px;color:#b5c8dd}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:8px;padding:12px 5px;background:#091728;border-top:1px solid #29435e}
+nav button{flex:1;max-width:170px;background:#19324b;color:#eaf5ff;font-size:12px;padding:11px 4px}
+nav button.active{background:#42d9f5;color:#071426}
+footer{text-align:center;color:#829bb5;font-size:12px;padding:20px}
+</style>
+</head>
+<body>
+<header>
+<h1>نبض الطالب 🎓</h1>
+<p>طريقك نحو التفوق — نظّم وقتك وحقّق أهدافك</p>
+</header>
+
+<main>
+<section id="home">
+<h2>أهلاً بيك يا بطل 👋</h2>
+<p style="color:#b5c8dd">كل إنجاز كبير بيبدأ بخطوة صغيرة.</p>
+<div class="stats">
+<div class="stat"><strong id="doneCount">0</strong><span>مهام مكتملة</span></div>
+<div class="stat"><strong id="totalCount">0</strong><span>إجمالي المهام</span></div>
+<div class="stat"><strong id="percentCount">0%</strong><span>نسبة الإنجاز</span></div>
+</div>
+
+<div class="card">
+<h2>📋 مهامي اليومية</h2>
+<form id="taskForm">
+<input id="taskInput" type="text" placeholder="اكتب المهمة هنا..." maxlength="120" required>
+<button type="submit">+ إضافة</button>
+</form>
+<div id="taskList"></div>
+</div>
+
+<div class="card">
+<h2>🧠 المراجعة الذكية</h2>
+<p>اختار مادة وابدأ جلسة مراجعة مركزة.</p>
+<form id="reviewForm">
+<select id="subject" aria-label="المادة">
+<option>الأحياء</option>
+<option>الكيمياء</option>
+<option>الفيزياء</option>
+<option>الرياضيات</option>
+<option>اللغة العربية</option>
+<option>اللغة الإنجليزية</option>
+<option>المواد الشرعية</option>
+</select>
+<button type="submit">ابدأ المراجعة</button>
+</form>
+<p id="reviewMessage" style="color:#42d9f5"></p>
+</div>
+</section>
+
+<section id="focus" hidden>
+<div class="card">
+<h2>⏱️ مؤقت المذاكرة</h2>
+<p>ركّز في مهمة واحدة وخد راحة بعد ما تخلص.</p>
+<div id="clock" style="font-size:54px;text-align:center;color:#42d9f5;margin:25px 0">25:00</div>
+<form id="timerForm" style="justify-content:center">
+<select id="duration" aria-label="مدة الجلسة">
+<option value="15">15 دقيقة</option>
+<option value="25" selected>25 دقيقة</option>
+<option value="30">30 دقيقة</option>
+<option value="45">45 دقيقة</option>
+<option value="60">60 دقيقة</option>
+</select>
+<button type="submit">بدء المؤقت</button>
+<button type="button" id="pauseTimer">إيقاف</button>
+<button type="button" id="resetTimer">إعادة</button>
+</form>
+</div>
+</section>
+
+<section id="schedule" hidden>
+<div class="card">
+<h2>📅 جدولي الدراسي</h2>
+<form id="scheduleForm">
+<select id="day" aria-label="اليوم">
+<option>السبت</option><option>الأحد</option><option>الاثنين</option><option>الثلاثاء</option><option>الأربعاء</option><option>الخميس</option><option>الجمعة</option>
+</select>
+<input id="subjectName" placeholder="اسم المادة" maxlength="60" required>
+<input id="lessonTime" placeholder="الوقت" maxlength="40" required>
+<button type="submit">إضافة</button>
+</form>
+<div id="scheduleList"></div>
+</div>
+</section>
+<footer>نبض الطالب · طريقك نحو التفوق</footer>
+</main>
+
+<nav>
+<button class="active" data-page="home">🏠 الرئيسية</button>
+<button data-page="focus">⏱️ التركيز</button>
+<button data-page="schedule">📅 الجدول</button>
+</nav>
+
 <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js")
-        .catch((error) => {
-          console.error("تعذر تسجيل Service Worker:", error);
-        });
-    });
-  }
-</script>  
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js");
-    });
-  }
+(function(){
+const $=id=>document.getElementById(id);
+const KEY="nabdStudentDataV3";
+let data={tasks:[],schedule:[]};
+try{
+ const old=JSON.parse(localStorage.getItem(KEY)||"null");
+ if(old&&Array.isArray(old.tasks)&&Array.isArray(old.schedule))data=old;
+}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}}
+function safe(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function renderTasks(){
+ const list=$("taskList");
+ if(!data.tasks.length)list.innerHTML='<div class="empty">لسه مفيش مهام. أضف أول مهمة! 🌟</div>';
+ else list.innerHTML=data.tasks.map((t,i)=>'<div class="task '+(t.done?'done':'')+'"><input type="checkbox" data-check="'+i+'" '+(t.done?'checked':'')+' aria-label="مهمة مكتملة"><span>'+safe(t.name)+'</span><button class="delete" data-delete="'+i+'">حذف</button></div>').join("");
+ const done=data.tasks.filter(t=>t.done).length,total=data.tasks.length;
+ $("doneCount").textContent=done;$("totalCount").textContent=total;
+ $("percentCount").textContent=(total?Math.round(done/total*100):0)+"%";
+}
+$("taskForm").addEventListener("submit",e=>{
+ e.preventDefault();const name=$("taskInput").value.trim();if(!name)return;
+ data.tasks.unshift({name,done:false});save();renderTasks();$("taskInput").value="";
+});
+$("taskList").addEventListener("change",e=>{
+ if(e.target.matches("[data-check]")){data.tasks[+e.target.dataset.check].done=e.target.checked;save();renderTasks()}
+});
+$("taskList").addEventListener("click",e=>{
+ const b=e.target.closest("[data-delete]");if(!b)return;
+ data.tasks.splice(+b.dataset.delete,1);save();renderTasks();
+});
+$("reviewForm").addEventListener("submit",e=>{
+ e.preventDefault();$("reviewMessage").textContent="ابدأ الآن مراجعة مادة "+$("subject").value+" لمدة 25 دقيقة 💪";
+});
+function renderSchedule(){
+ const list=$("scheduleList");
+ if(!data.schedule.length){list.innerHTML='<div class="empty">أضف مواعيد دروسك هنا.</div>';return}
+ list.innerHTML=data.schedule.map((x,i)=>'<div class="task"><span><b>'+safe(x.day)+" — "+safe(x.subject)+'</b><br><small>'+safe(x.time)+'</small></span><button class="delete" data-sdelete="'+i+'">حذف</button></div>').join("");
+}
+$("scheduleForm").addEventListener("submit",e=>{
+ e.preventDefault();data.schedule.push({day:$("day").value,subject:$("subjectName").value.trim(),time:$("lessonTime").value.trim()});
+ save();renderSchedule();$("subjectName").value="";$("lessonTime").value="";
+});
+$("scheduleList").addEventListener("click",e=>{
+ const b=e.target.closest("[data-sdelete]");if(!b)return;
+ data.schedule.splice(+b.dataset.sdelete,1);save();renderSchedule();
+});
+document.querySelectorAll("[data-page]").forEach(btn=>btn.addEventListener("click",()=>{
+ document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b===btn));
+ ["home","focus","schedule"].forEach(id=>$(id).hidden=id!==btn.dataset.page);
+ window.scrollTo(0,0);
+}));
+let remaining=1500,interval=null;
+function showClock(){$("clock").textContent=String(Math.floor(remaining/60)).padStart(2,"0")+":"+String(remaining%60).padStart(2,"0")}
+function stop(){if(interval!==null){clearInterval(interval);interval=null}}
+function reset(){stop();remaining=Number($("duration").value)*60;showClock()}
+$("timerForm").addEventListener("submit",e=>{
+ e.preventDefault();stop();if(remaining<=0)reset();
+ interval=setInterval(()=>{remaining--;showClock();if(remaining<=0){stop();alert("أحسنت! انتهت جلسة المذاكرة 👏");reset()}},1000);
+});
+$("pauseTimer").addEventListener("click",stop);
+$("resetTimer").addEventListener("click",reset);
+$("duration").addEventListener("change",reset);
+renderTasks();renderSchedule();showClock();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
+})();
 </script>
-  
-</body
+</body>
+</html>
+
